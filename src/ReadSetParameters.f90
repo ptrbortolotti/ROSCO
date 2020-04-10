@@ -261,9 +261,7 @@ CONTAINS
         ! ----- Torque controller reference errors -----
         ! Define VS reference generator speed [rad/s]
         IF (CntrPar%VS_ControlMode == 2) THEN
-            ! WE_Vw_f = LPFilter(LocalVar%We_Vw, LocalVar%DT, 0.625, LocalVar%iStatus, .FALSE., objInst%instLPF)
-            WE_Vw_f = LocalVar%We_Vw
-            VS_RefSpd = (CntrPar%VS_TSRopt * WE_Vw_f / CntrPar%WE_BladeRadius) * CntrPar%WE_GearboxRatio
+            VS_RefSpd = (CntrPar%VS_TSRopt * LocalVar%We_Vw / CntrPar%WE_BladeRadius) * CntrPar%WE_GearboxRatio
             VS_RefSpd = saturate(VS_RefSpd,CntrPar%VS_MinOMSpd, CntrPar%VS_RefSpd)
         ELSE
             VS_RefSpd = CntrPar%VS_RefSpd
@@ -409,12 +407,12 @@ CONTAINS
         
         IF (CntrPar%VS_KP(1) > 0.0) THEN
             aviFAIL = -1
-            ErrMsg  = 'VS_KP must be greater than zero.'
+            ErrMsg  = 'VS_KP must be less than zero.'
         ENDIF
         
         IF (CntrPar%VS_KI(1) > 0.0) THEN
             aviFAIL = -1
-            ErrMsg  = 'VS_KI must be greater than zero.'
+            ErrMsg  = 'VS_KI must be less than zero.'
         ENDIF
         
         IF (CntrPar%PC_RefSpd <= 0.0) THEN
@@ -573,7 +571,7 @@ CONTAINS
             LocalVar%Y_YawEndT = -1.0 ! This will ensure that the initial yaw end time is lower than the actual time to prevent initial yawing
             
             ! Wind speed estimator initialization, we always assume an initial wind speed of 10 m/s
-            LocalVar%WE_Vw = 10
+            LocalVar%WE_Vw = LocalVar%HorWindV
             LocalVar%WE_VwI = LocalVar%WE_Vw - CntrPar%WE_Gamma*LocalVar%RotSpeed
             
             ! Setpoint Smoother initialization to zero
