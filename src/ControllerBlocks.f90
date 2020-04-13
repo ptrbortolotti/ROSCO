@@ -297,6 +297,7 @@ CONTAINS
         REAL(4)                      :: V_NearRated
         REAL(4)                      :: YawSD_Slope
         REAL(4)                      :: Offset
+        REAL(4)                      :: Delta
         REAL(4)                      :: MaxYaw
         REAL(4)                      :: SD_slope
         REAL(4), Save                :: SD_time = 0.0
@@ -316,23 +317,22 @@ CONTAINS
             ! Find maximum yaw angle
             YawSD_Slope = (120.0 - 60.0)/(CntrPar%VS_MinOMSpd - CntrPar%PC_RefSpd)
             Offset = 120.0 - YawSD_Slope * CntrPar%VS_MinOMSpd
-            IF (LocalVar%GenSpeedF < CntrPar%VS_MinOMSpd) THEN
+            Delta = CntrPar%PC_RefSpd - CntrPar%VS_MinOMSpd
+            IF (LocalVar%GenSpeedF < CntrPar%VS_MinOMSpd + 0.2 * Delta) THEN
                 MaxYaw = 360.0 ! No shutdown in WE_Vw < 5.0 m/s
             ELSE 
                 MaxYaw = YawSD_Slope * LocalVar%GenSpeedF + Offset ! In Degrees
             ENDIF
             MaxYaw = max(MaxYaw, 50.0)
             ! Shutdown?
-            IF (LocalVar%Time > 30.0) THEN
-                IF (LocalVar%GenSpeedF > CntrPar%PC_RefSpd*1.2) THEN
-                    LocalVar%SD  = .TRUE.
-                ELSEIF (SD_BlPitchF > CntrPar%SD_MaxPit) THEN
-                    LocalVar%SD  = .TRUE.
-                ELSEIF (ABS(SD_YawErrF) > MaxYaw*D2R) THEN 
-                    LocalVar%SD  = .TRUE.
-                ELSE
-                    LocalVar%SD  = .FALSE.
-                ENDIF 
+            IF (LocalVar%GenSpeedF > CntrPar%PC_RefSpd*1.2 .AND. LocalVar%Time > 120.0) THEN
+                LocalVar%SD  = .TRUE.
+            ELSEIF (SD_BlPitchF > CntrPar%SD_MaxPit .AND. LocalVar%Time > 120.0) THEN
+                LocalVar%SD  = .TRUE.
+            ELSEIF (ABS(SD_YawErrF) > MaxYaw*D2R .AND. LocalVar%Time > 30.0) THEN 
+                LocalVar%SD  = .TRUE.
+            ELSE
+                LocalVar%SD  = .FALSE.
             ENDIF
         ENDIF
 
@@ -341,8 +341,7 @@ CONTAINS
             
             ! E-stop - Pitch-to-stall (downwind, Below Rated)
             IF (( (downwind) .AND. (LocalVar%GenTq < 0.9*CntrPar%VS_ArSatTq) .AND. &
-                (LocalVar%PC_PitComT < 2.0*D2R) ) &
-                .OR. (SD_p2s) ) THEN
+                (LocalVar%BlPitch(1) < 2.0*D2R) ) .OR. (SD_p2s) ) THEN
 
                 Shutdown = LocalVar%BlPitch(1) - CntrPar%PC_MaxRat*LocalVar%DT
                 LocalVar%PC_MinPit = -90*D2R
