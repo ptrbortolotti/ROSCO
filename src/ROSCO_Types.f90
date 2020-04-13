@@ -182,7 +182,9 @@ TYPE, PUBLIC :: LocalVariables
     REAL(4)                             :: VS_SpdErrBr                  ! Current speed error for region 1.5 PI controller (generator torque control) [rad/s].
     REAL(4)                             :: VS_SpdErr                    ! Current speed error for tip-speed-ratio tracking controller (generator torque control) [rad/s].
     INTEGER(4)                          :: VS_State                     ! State of the torque control system
+    REAL(4)                             :: HorWindV_F                   ! Filtered wind speed [m/s]
     REAL(4)                             :: WE_Vw                        ! Estimated wind speed [m/s]
+    REAL(4)                             :: WE_Vw_F                      ! Filtered estimated wind speed [m/s]
     REAL(4)                             :: WE_VwI                       ! Integrated wind speed quantity for estimation [m/s]
     REAL(4)                             :: WE_VwIdot                    ! Differentiated integrated wind speed quantity for estimation [m/s]
     REAL(4)                             :: Y_AccErr                     ! Accumulated yaw error [rad].
