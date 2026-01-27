@@ -145,7 +145,7 @@ def write_DISCON(turbine, controller, param_file='DISCON.IN', txt_filename='Cp_C
     file.write('\n')
     file.write('!------- BLADE PITCH CONTROL ----------------------------------------------\n')
     file.write('{:<11d}         ! PC_GS_n			- Amount of gain-scheduling table entries\n'.format(int(rosco_vt['PC_GS_n'])))
-    file.write('{}              ! PC_GS_angles	    - Gain-schedule table: pitch angles [rad].\n'.format(write_array(rosco_vt['PC_GS_angles'],'<12.3f')))            
+    file.write('{}              ! PC_GS_angles	    - Gain-schedule table: pitch angles [rad].\n'.format(write_array(rosco_vt['PC_GS_angles'],'<12.6f')))            
     file.write('{}              ! PC_GS_KP		- Gain-schedule table: pitch controller kp gains [s].\n'.format(write_array(rosco_vt['PC_GS_KP'],'<12.3e')))
     file.write('{}              ! PC_GS_KI		- Gain-schedule table: pitch controller ki gains [-].\n'.format(write_array(rosco_vt['PC_GS_KI'],'<12.3e')))
     file.write('{}              ! PC_GS_KD			- Gain-schedule table: pitch controller kd gains\n'.format(write_array(rosco_vt['PC_GS_KD'],'<12.3e')))
